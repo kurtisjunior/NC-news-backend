@@ -8,3 +8,9 @@ const data = {
 
 //export the property value of whatever the environment variable is set to
 module.exports = data[environment]
+
+
+
+
+
+//may need changing to include the DB_URL
