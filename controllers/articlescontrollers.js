@@ -25,10 +25,17 @@ const postComment = (req, res, next) => {
 }
 
 
+const voteQuery = (req, res, next) => {
+    const id = req.params.article_id
+    const query = req.query.vote;
+    //not great readability but does the job
+    Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } })
+        .then(article => {
+            res.send(article);
+        })
+}
 
-
-
-module.exports = { getAllArticles, oneArticle, allComments, postComment }
+module.exports = { getAllArticles, oneArticle, allComments, postComment, voteQuery }
 
 
 
