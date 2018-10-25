@@ -29,22 +29,23 @@ describe('/api', () => {
             comments = docs[3]
         })
     })
-})
-describe('/', () => {
-    it('returns a status 200 for the homepage', () => {
-        return request
-            .get('/api')
-            .expect(200)
-            .then(res => {
-                console.log(res.body)
-                // expect(res.body)
-            })
+    describe('/', () => {
+        it('returns a status 200 for the homepage', () => {
+            return request
+                .get('/api')
+                .expect(200)
+                .then(res => {
+                    console.log(res.body)
+                    // expect(res.body)
+                })
+        })
+        //or afterEach test then disconnect
+        after(() => {
+            mongoose.disconnect()
+        })
     })
-    //or afterEach test then disconnect
-    after(() => {
-        mongoose.disconnect()
-    })
 })
+
 
 
 /*
@@ -65,7 +66,6 @@ expect(res.body._id).to.equal(articlesDocs[0]._id) --> docs is a string, db is a
 
 
 
-
 img for error handling 404 (article doesnt exist)
 forces rejection 
 
@@ -73,7 +73,25 @@ three error blocks in the app (extracted into an errors folder)
 img
 
 
+CastError (400)
+if err.sttus === 400 || err.name === 'CastError' ---> mongo error messages 
+res.status.send({'bad request'})
 
+should we do all the errors ? 
+200 good
+404 err
+400 err
+
+catch 9/10 
+
+
+comment count (modify properties)
+return value is frozen inside the promise 
+so, to motify 
+
+'.lean()'
+
+comment.find({belongs_to: article._id}).countDocuments ----> returns the count of how many docs (articles ?) a particular id has 
 
 
 

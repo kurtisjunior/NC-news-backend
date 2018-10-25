@@ -1,4 +1,4 @@
-const { Article } = require('../models/index');
+const { Article, Comment } = require('../models/index');
 
 
 
@@ -13,9 +13,22 @@ const oneArticle = (req, res, next) => {
         .then(singleArticle => res.status(200).send(singleArticle))
 }
 
+const allComments = (req, res, next) => {
+    const match = req.params.article_id;
+    Comment.find({ 'belongs_to': match }).populate('belongs_to').populate('created_by')
+        .then(comments => res.status(200).send(comments))
+}
+
+const postComment = (req, res, next) => {
+    Comment.create(req.body)
+        .then(newComment => res.status(200).send(newComment));
+}
 
 
-module.exports = { getAllArticles, oneArticle }
+
+
+
+module.exports = { getAllArticles, oneArticle, allComments, postComment }
 
 
 

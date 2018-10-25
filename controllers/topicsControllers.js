@@ -6,14 +6,20 @@ const getAllTopics = (req, res, next) => {
 }
 
 
-
 const getTopicArticles = (req, res, next) => {
     // console.log(req.params.topic_slug);
     const match = req.params.topic_slug;
-
     Article.find({ 'belongs_to': match })
         .then(articlesForTopic => res.status(200).send(articlesForTopic));
 }
 
 
-module.exports = { getAllTopics, getTopicArticles };
+const postArticle = (req, res, next) => {
+    Article.create(req.body)
+        .then(newArticle => res.status(200).send(newArticle))
+}
+
+
+
+
+module.exports = { getAllTopics, getTopicArticles, postArticle };
