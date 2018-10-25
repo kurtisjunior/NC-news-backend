@@ -1,12 +1,10 @@
-// Figure out dev environment and other variables later
+//test environment or not (set in the spec test file)
+const environment = process.env.NODE_ENV || 'dev'
 
+const data = {
+    "dev": './devData/index',
+    "test": './testData/index'
+}
 
-// const environment = process.env.NODE_ENV || 'dev'
-
-const DB_URL = 'mongodb://localhost:27017/northcodersNewsDatabase';
-
-
-
-
-
-module.exports = DB_URL;
+//export the property value of whatever the environment variable is set to
+module.exports = data[environment]

@@ -23,12 +23,11 @@ const seedDB = (articles, comments, topics, users) => {
         })
         .then((array) => {
             const articles = array[0];
+            const topics = array[1];
             const users = array[2];
-
             //all data passed through
-            const allComments = getComments(comments, users, articles)
-            console.log(allComments);
-            // console.log(allComments);
+            const allcomments = getComments(comments, users, articles)
+            return Promise.all([Comment.insertMany(allcomments), articles, topics, users])
         })
         .catch(console.log);
 }
@@ -41,4 +40,5 @@ module.exports = seedDB;
 //check db status for comments 
 //check db for all data
 //begin API
+
 
