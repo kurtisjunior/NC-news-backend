@@ -21,9 +21,13 @@ const allComments = (req, res, next) => {
 
 const postComment = (req, res, next) => {
     Comment.create(req.body)
-        .then(newComment => res.status(200).send(newComment));
+        .then(newComment => {
+            newComment.populate('created_by')
+            res.status(200).send(newComment);
+        })
 }
 
+//Comment.populate(newComment, { path: 'newComment', model: 'User' })
 
 const voteQuery = (req, res, next) => {
     const id = req.params.article_id
