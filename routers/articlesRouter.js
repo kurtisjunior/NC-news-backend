@@ -1,5 +1,5 @@
 const articlesRouter = require('express').Router();
-const { getAllArticles, oneArticle, allComments, postComment, voteQuery } = require('../controllers/articlesControllers')
+const { getAllArticles, oneArticle, allComments, postComment, voteQuery } = require('../controllers/articlesControllers.js')
 
 
 
