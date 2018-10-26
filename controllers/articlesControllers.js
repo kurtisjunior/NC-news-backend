@@ -29,14 +29,16 @@ const allComments = (req, res, next) => {
 
 const postComment = (req, res, next) => {
     Comment.create(req.body)
-        .then(newComment => {
-            //returns the new comment populated
-            return newComment.findById(newComment._id).populate('created_by')
-        })
         .then((newComment) => {
             res.status(201).send(newComment);
         })
 }
+
+//PROBLEMS WITH POPULATE AND CALLBACK 
+// .then(newComment => {
+//     //returns the new comment populated
+//     return newComment.findById(newComment._id).populate('created_by')
+// })
 
 
 const voteQuery = (req, res, next) => {
