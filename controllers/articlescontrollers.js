@@ -1,16 +1,24 @@
 const { Article, Comment } = require('../models/index');
 
-
-
 const getAllArticles = (req, res, next) => {
     Article.find().populate('created_by')
-        .then(articles => res.status(200).send(articles));
+        .then(articles => {
+            res.status(200).send(articles);
+        })
+        .catch(next);
 }
 
 const oneArticle = (req, res, next) => {
     const match = req.params.article_id;
-    Article.find({ '_id': match }).populate('created_by')
-        .then(singleArticle => res.status(200).send(singleArticle))
+    Article.findOne({ '_id': match }).populate('created_by')
+        .then(singleArticle => {
+            if (!singleArticle) {
+                return Promise.reject({ status: 404 })
+            } else {
+                res.status(200).send(singleArticle)
+            }
+        })
+        .catch(next)
 }
 
 const allComments = (req, res, next) => {
@@ -42,6 +50,3 @@ const voteQuery = (req, res, next) => {
 module.exports = { getAllArticles, oneArticle, allComments, postComment, voteQuery }
 
 
-
-
-//populate the created by 

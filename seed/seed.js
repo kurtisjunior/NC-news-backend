@@ -28,7 +28,7 @@ const seedDB = (articles, comments, topics, users) => {
             //all data passed through
             const allcomments = getComments(comments, users, articles)
             //return everything to help with the test
-            return Promise.all([Comment.insertMany(allcomments), articles, topics, users])
+            return Promise.all([articles, Comment.insertMany(allcomments), topics, users])
         })
         .catch(console.log);
 }

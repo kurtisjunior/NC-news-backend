@@ -24,15 +24,16 @@ correct format of the config file
 */
 const mongoose = require('mongoose');
 const seedDB = require('./seed')
-const db = require('../config')
+const { DB_URL } = require('../config')
+
 //use test or dev data depending on environment 
-const { articles, comments, topics, users } = require(db)
+const { database } = require('../config')
+const { articles, comments, topics, users } = require(database)
 
-//per mongoose spec
-const DB_URL = 'mongodb://localhost:27017/northcodersNewsDatabase';
 
+console.log(DB_URL)
 // seeding db functionality in seed file 
-mongoose.connect(DB_URL, { useNewUrlParser: true })
+mongoose.connect(DB_URL)
     .then(() => {
         console.log(`connected to ${DB_URL}`);
         return seedDB(articles, comments, topics, users)
@@ -44,10 +45,3 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
     })
     .catch(console.log)
 
-
-
-/*questions for review
-last then block 
-How can I pass down variables in the promise chain without using an array each time ?
-
-*/

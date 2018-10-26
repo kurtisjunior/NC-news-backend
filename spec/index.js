@@ -1,11 +1,3 @@
-/* to do
-set the environment to test 
-install mocha, chai, and superagent 
-edit script to run test
-drop and create database in here somewhow 
-connect and disconnect the database 
-*/
-
 process.env.NODE_ENV = "test"
 
 const { expect } = require('chai');
@@ -13,88 +5,53 @@ const app = require('../app')
 const mongoose = require('mongoose')
 const request = require('supertest')(app);
 const seedDB = require('../seed/seed')
-const { getTopics, getUsers, getArticles, getComments } = require('../utils')
+
+const { database } = require('../config')
+const { articles, comments, topics, users } = require(database)
+
+
 
 
 describe('/api', () => {
-    //need to keep the data in scope of the whole test suite
-    let topics, users, articles, comments;
-    //mocha hook (do something before this)
+    let topicDocs, userDocs, articleDocs, commentDocs, bad_id = mongoose.Types.ObjectId();
     beforeEach(() => {
-        //return because we need to wait for it to complete 
-        return seedDB(getTopics, getUsers, getArticles, getComments).then(docs => {
-            topics = docs[0]
-            users = docs[1]
-            articles = docs[2]
-            comments = docs[3]
-        })
+        return seedDB(articles, comments, topics, users)
+            .then((allDocs) => {
+                articleDocs = allDocs[0]
+                commentDocs = allDocs[1];
+                topicDocs = allDocs[2];
+                userDocs = allDocs[3];
+            })
     })
+
     describe('/', () => {
-        it('returns a status 200 for the homepage', () => {
+        it('returns a status 200 for the api path page', () => {
             return request
                 .get('/api')
                 .expect(200)
-                .then(res => {
-                    console.log(res.body)
-                    // expect(res.body)
-                })
-        })
-        //or afterEach test then disconnect
-        after(() => {
-            mongoose.disconnect()
         })
     })
+
+    describe('/:articles/id', () => {
+        it('returns a status 200 for article by ID', () => {
+            return request
+                .get(`/api/articles/${articleDocs[0]._id}`)
+                .expect(200)
+                .then(result => {
+                    expect(result.body.title).to.equal(articleDocs[0].title)
+                    expect(result.body.body).to.equal(articleDocs[0].body);
+                })
+        })
+        it('returns a 404 if the ID does not exist', () => {
+            return request
+                .get(`/api/articles/${bad_id}`)
+                .expect(404)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('page not found')
+                })
+        })
+    })
+    after(() => {
+        mongoose.disconnect()
+    })
 })
-
-
-
-/*
-
-
-Lecture 
-
-then test the topics.length 
-and other specs on the docs
-
-find by Id posible alternative to the find by article_id 
-
-GET one id test  
-.get('/api/articles/${articlesDocs[0]._id})   ---> get the first one from the collection 
-.expect(200)
-expect(res.body._id).to.equal(articlesDocs[0]._id) --> docs is a string, db is a js object so needs to be tured to string representation ${articleDocs[0]._id} --> mongo quirk
-*REMEMBER The above can be translated to is the variable (topics.something) equal to the topics something I have in my DB 
-
-
-
-img for error handling 404 (article doesnt exist)
-forces rejection 
-
-three error blocks in the app (extracted into an errors folder)
-img
-
-
-CastError (400)
-if err.sttus === 400 || err.name === 'CastError' ---> mongo error messages 
-res.status.send({'bad request'})
-
-should we do all the errors ? 
-200 good
-404 err
-400 err
-
-catch 9/10 
-
-
-comment count (modify properties)
-return value is frozen inside the promise 
-so, to motify 
-
-'.lean()'
-
-comment.find({belongs_to: article._id}).countDocuments ----> returns the count of how many docs (articles ?) a particular id has 
-
-
-
-
-
-*/

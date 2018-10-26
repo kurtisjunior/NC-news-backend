@@ -9,7 +9,6 @@ populate articles belongs to x
 return articles for a certain topic x 
 
 
-
 5. return a comment_count property
 NC HELP populate the created comments belongs_to and created_by
 */
@@ -18,8 +17,8 @@ const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const apiRouter = require('./routers/apiRouter')
-
-const DB_URL = 'mongodb://localhost:27017/northcodersNewsDatabase';
+const { DB_URL } = require('./config')
+const { handle400, handle404, handle500 } = require('./errors')
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json())
@@ -31,8 +30,21 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
     .then(() => console.log(`connected to ${DB_URL}`))
     .catch(console.log)
 
-
 app.use('/api', apiRouter);
+
+
+
+//error handling
+app.use('/*', (req, res, next) => {
+    next({ status: 400 });
+});
+
+app.use(handle400);
+app.use(handle404);
+app.use(handle500);
+
+
+
 
 
 
