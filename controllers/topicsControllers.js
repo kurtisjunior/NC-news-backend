@@ -15,7 +15,7 @@ const getTopicArticles = (req, res, next) => {
 
 const postArticle = (req, res, next) => {
     Article.create(req.body)
-        .then(newArticle => res.status(200).send(newArticle))
+        .then(newArticle => res.status(201).send(newArticle))
 }
 
 

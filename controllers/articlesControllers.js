@@ -30,18 +30,20 @@ const allComments = (req, res, next) => {
 const postComment = (req, res, next) => {
     Comment.create(req.body)
         .then(newComment => {
-            newComment.populate('created_by')
-            res.status(200).send(newComment);
+            //returns the new comment populated
+            return newComment.findById(newComment._id).populate('created_by')
+        })
+        .then((newComment) => {
+            res.status(201).send(newComment);
         })
 }
 
-//Comment.populate(newComment, { path: 'newComment', model: 'User' })
 
 const voteQuery = (req, res, next) => {
     const id = req.params.article_id
     const query = req.query.vote;
     //not great readability but does the job
-    Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } })
+    Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
         .then(article => {
             res.send(article);
         })

@@ -11,7 +11,6 @@ const { articles, comments, topics, users } = require(database)
 
 
 
-
 describe('/api', () => {
     let topicDocs, userDocs, articleDocs, commentDocs, bad_id = mongoose.Types.ObjectId();
     beforeEach(() => {
@@ -31,8 +30,48 @@ describe('/api', () => {
                 .expect(200)
         })
     })
+    //SANITY CHECK 
+    describe('PATHS /topics', () => {
+        it('returns a status 200 and all topics', () => {
+            return request
+                .get('/api/topics')
+                .expect(200)
+                .then(result => {
+                    expect(result.body[0].title).to.equal(topicDocs[0].title)
+                })
+        })
+    })
+    describe('GET /api/topics/:topic_slug/articles', () => {
+        it('returns a status 200 and all articles for a certain topic', () => {
+            return request
+                .get(`/api/topics/${articleDocs[0].belongs_to}/articles`)
+                .expect(200)
+                .then(result => {
+                    expect(result.body[0].belongs_to).to.equal(articleDocs[0].belongs_to)
+                })
+        })
+    })
 
-    describe('/:articles/id', () => {
+    describe('POST /api/topics/:topic_slug/articles', () => {
+        it('returns a status 201 and adds a new article', () => {
+            const mezut = ({
+                votes: '10',
+                created_at: "2018-04-16T19:29:32.774Z",
+                title: "Mezut Ozil",
+                created_by: "5bd3237c1e6558f70b448de4",
+                body: "11 wins on the bounce.",
+                belongs_to: "football"
+            })
+            return request
+                .post('/api/topics/football/articles')
+                .send(mezut)
+                .expect(201)
+                .then(result => {
+                    expect(result.body.title).to.equal(mezut.title)
+                })
+        })
+    })
+    describe('GET /:articles/id', () => {
         it('returns a status 200 for article by ID', () => {
             return request
                 .get(`/api/articles/${articleDocs[0]._id}`)
@@ -42,7 +81,7 @@ describe('/api', () => {
                     expect(result.body.body).to.equal(articleDocs[0].body);
                 })
         })
-        it('returns a 404 if the ID does not exist', () => {
+        it('GET returns a 404 if the ID does not exist', () => {
             return request
                 .get(`/api/articles/${bad_id}`)
                 .expect(404)
@@ -51,6 +90,29 @@ describe('/api', () => {
                 })
         })
     })
+    describe('PATCH /api/articles/:article_id', () => {
+        it('returns a status 200 and updates an article vote count', () => {
+            const vote = articleDocs[0].votes
+            return request
+                .patch(`/api/articles/${articleDocs[0]._id}?vote=up`)
+                .expect(200)
+                .then((result) => {
+                    expect(result.body.votes).to.equal(vote + 1);
+                })
+        })
+    })
+    describe('PATCH /api/articles/:article_id', () => {
+        it('returns a status 200 and updates a comment vote count', () => {
+            const vote = commentDocs[0].votes
+            return request
+                .patch(`/api/comments/${commentDocs[0]._id}?vote=down`)
+                .expect(200)
+                .then((result) => {
+                    expect(result.body.votes).to.equal(vote - 1);
+                })
+        })
+    })
+
     after(() => {
         mongoose.disconnect()
     })
