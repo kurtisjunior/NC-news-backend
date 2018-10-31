@@ -2,20 +2,37 @@ const { Article, Comment } = require('../models/index');
 
 const getAllArticles = (req, res, next) => {
     Article.find().populate('created_by')
+        .lean()
         .then(articles => {
+            const articlesWithCommentCount = articles.map((article => {
+                return Comment.find({ belongs_to: article._id })
+                    .then((res) => {
+                        article.comment_count = res.length
+                        return article
+                    })
+            }))
+            return Promise.all(articlesWithCommentCount)
+        })
+        .then((articles) => {
             res.status(200).send(articles);
         })
         .catch(next);
 }
 
+
 const oneArticle = (req, res, next) => {
     const match = req.params.article_id;
     Article.findOne({ '_id': match }).populate('created_by')
+        .lean()
         .then(singleArticle => {
             if (!singleArticle) {
                 return Promise.reject({ status: 404 })
             } else {
-                res.status(200).send(singleArticle)
+                Comment.find({ belongs_to: match })
+                    .then((comments) => {
+                        singleArticle.comment_count = comments.length
+                        res.status(200).send(singleArticle)
+                    })
             }
         })
         .catch(next)
@@ -29,16 +46,14 @@ const allComments = (req, res, next) => {
 
 const postComment = (req, res, next) => {
     Comment.create(req.body)
+        .then(newComment => {
+            //returns the new comment populated
+            return Comment.findById(newComment._id).populate('created_by')
+        })
         .then((newComment) => {
             res.status(201).send(newComment);
         })
 }
-
-//PROBLEMS WITH POPULATE AND CALLBACK 
-// .then(newComment => {
-//     //returns the new comment populated
-//     return newComment.findById(newComment._id).populate('created_by')
-// })
 
 
 const voteQuery = (req, res, next) => {

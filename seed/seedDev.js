@@ -31,7 +31,6 @@ const { database } = require('../config')
 const { articles, comments, topics, users } = require(database)
 
 
-console.log(DB_URL)
 // seeding db functionality in seed file 
 mongoose.connect(DB_URL)
     .then(() => {

@@ -1,4 +1,4 @@
-exports.getTopics = (topicData) => {
+exports.formatTopics = (topicData) => {
     const topics = topicData.map((element) => {
         return {
             title: element.title,
@@ -9,7 +9,7 @@ exports.getTopics = (topicData) => {
 }
 
 
-exports.getUsers = (userData) => {
+exports.formatUsers = (userData) => {
     const users = userData.map((element) => {
         return {
             username: element.username,
@@ -21,19 +21,17 @@ exports.getUsers = (userData) => {
 }
 
 
-
-function articleUserID(article, users) {
+function formatUserID(article, users) {
     const name = article.created_by;
     const userId = users.find(element => element.username === name)._id;
     return userId;
 }
 
-exports.getArticles = (articleRawData, users) => {
+exports.formatArticles = (articleRawData, users) => {
     const articles = articleRawData.map((article) => {
         return {
             ...article,
-            votes: Math.floor(Math.random() * 10),
-            created_by: articleUserID(article, users),
+            created_by: formatUserID(article, users),
             belongs_to: article.topic
         }
     })
@@ -55,7 +53,7 @@ function belongsToUserId(comment, articles) {
 }
 
 
-exports.getComments = (commentsRawData, users, articles) => {
+exports.formatComments = (commentsRawData, users, articles) => {
     const comments = commentsRawData.map((comment) => {
         return {
             ...comment,
@@ -66,6 +64,3 @@ exports.getComments = (commentsRawData, users, articles) => {
     return comments;
 }
 
-
-//if the belongs matches to and the title 
-//then get the article_ID 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 //utils to manipulate data (communicates directly and builds per format)
-const { getTopics, getUsers, getArticles, getComments } = require('../utils')
+const { formatTopics, formatUsers, formatArticles, formatComments } = require('../utils')
 
 //models 
 const { Topic, User, Article, Comment } = require('../models/index')
@@ -11,22 +11,17 @@ const { Topic, User, Article, Comment } = require('../models/index')
 const seedDB = (articles, comments, topics, users) => {
     return mongoose.connection.dropDatabase()
         .then(() => {
-            const allTopics = getTopics(topics)
-            const allUsers = getUsers(users)
+            const allTopics = formatTopics(topics)
+            const allUsers = formatUsers(users)
             return Promise.all([Topic.insertMany(allTopics), User.insertMany(allUsers)])
         })
-        .then((array) => {
-            const topics = array[0];
-            const users = array[1];
-            const allArticles = getArticles(articles, users)
+        .then(([topics, users]) => {
+            const allArticles = formatArticles(articles, users)
             return Promise.all([Article.insertMany(allArticles), topics, users]);
         })
-        .then((array) => {
-            const articles = array[0];
-            const topics = array[1];
-            const users = array[2];
+        .then(([articles, topics, users]) => {
             //all data passed through
-            const allcomments = getComments(comments, users, articles)
+            const allcomments = formatComments(comments, users, articles)
             //return everything to help with the test
             return Promise.all([articles, Comment.insertMany(allcomments), topics, users])
         })
@@ -37,9 +32,11 @@ const seedDB = (articles, comments, topics, users) => {
 module.exports = seedDB;
 
 
-//put the comments into the DB 
-//check db status for comments 
-//check db for all data
-//begin API
 
 
+// .then((array) => {
+//     const topics = array[0];
+//     const users = array[1];
+//     const allArticles = getArticles(articles, users)
+//     return Promise.all([Article.insertMany(allArticles), topics, users]);
+// })

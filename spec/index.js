@@ -114,7 +114,7 @@ describe('/api', () => {
     })
 
     describe('POST /api/articles/:article_id/comments', () => {
-        it.only('returns a status 201 and posts a new comment', () => {
+        it('returns a status 201 and posts a new comment', () => {
             const test = ({
                 votes: "7",
                 created_at: "2017-07-26T06:42:10.835Z",
@@ -186,7 +186,7 @@ TODO:
 
 One failing test for each path
 counter 
+populate created comment belongs to
 ReadMe 
-
 
 */
