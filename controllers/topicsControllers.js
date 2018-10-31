@@ -1,15 +1,28 @@
-const { Topic, Article } = require('../models/index')
+const { Topic, Article, Comment } = require('../models/index')
 
 const getAllTopics = (req, res, next) => {
     Topic.find()
         .then(topics => res.status(200).send(topics));
 }
 
-
 const getTopicArticles = (req, res, next) => {
     const match = req.params.topic_slug;
     Article.find({ 'belongs_to': match })
-        .then(articlesForTopic => res.status(200).send(articlesForTopic));
+        .lean()
+        .then((articlesForTopic => {
+            const articlesWithCommentCount = articlesForTopic.map((article) => {
+                return Comment.find({ belongs_to: article._id })
+                    .then((res) => {
+                        article.comment_count = res.length
+                        return article
+                    })
+            })
+            return Promise.all(articlesWithCommentCount)
+        }))
+        .then((articles) => {
+            res.status(200).send(articles)
+
+        })
 }
 
 
