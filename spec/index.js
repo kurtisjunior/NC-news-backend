@@ -49,6 +49,15 @@ describe('/api', () => {
                     expect(result.body[0].belongs_to).to.equal(articleDocs[0].belongs_to)
                 })
         })
+        it('returns a status 404 for an invalid topic', () => {
+            return request
+                .get(`/api/topics/tennis/articles`)
+                .expect(404)
+                .then(result => {
+                    expect(result.body.msg).to.equal('page not found')
+                })
+
+        })
     })
 
     describe('POST /api/topics/:topic_slug/articles', () => {

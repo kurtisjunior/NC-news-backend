@@ -1,18 +1,3 @@
-/*
-1. build express app x
-2. Mount API router  x
-3. Define routers and controllers 
-Beginning with the routes HTML page x
-Get topics x 
-Get Articles x 
-populate articles belongs to x 
-return articles for a certain topic x 
-
-
-5. return a comment_count property
-NC HELP populate the created comments belongs_to and created_by
-*/
-
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
@@ -33,8 +18,6 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
 app.use('/api', apiRouter);
 
 
-
-//error handling
 app.use('/*', (req, res, next) => {
     next({ status: 400 });
 });
@@ -46,9 +29,24 @@ app.use(handle500);
 
 
 
-
-
-
-
-
 module.exports = app;
+
+
+
+
+/* notes 
+QUESTIONS
+Post Article comments. they're always going to be 0, right ?
+
+spec tests
+.get(`/api/topics/tennis/articles`) is this path okay ? 
+Are my status codes correct ? 
+
+
+
+
+
+TO DO: 
+Mitches notes
+continue writing tests and refactoringthe controllers with a catch block**. Then trace the error message
+*/

@@ -7,30 +7,39 @@ const getAllTopics = (req, res, next) => {
 
 const getTopicArticles = (req, res, next) => {
     const match = req.params.topic_slug;
-    Article.find({ 'belongs_to': match })
+    Article.find({ 'belongs_to': match }).populate('created_by')
         .lean()
         .then((articlesForTopic => {
-            const articlesWithCommentCount = articlesForTopic.map((article) => {
-                return Comment.find({ belongs_to: article._id })
-                    .then((res) => {
-                        article.comment_count = res.length
-                        return article
-                    })
-            })
-            return Promise.all(articlesWithCommentCount)
+            if (!articlesForTopic || articlesForTopic.length === 0) {
+                return Promise.reject({ status: 404 })
+            } else {
+                const articlesWithCommentCount = articlesForTopic.map((article) => {
+                    return Comment.find({ belongs_to: article._id })
+                        .then((res) => {
+                            article.comment_count = res.length
+                            return article
+                        })
+                })
+                return Promise.all(articlesWithCommentCount)
+            }
         }))
         .then((articles) => {
             res.status(200).send(articles)
-
         })
+        .catch(next)
 }
-
 
 const postArticle = (req, res, next) => {
     Article.create(req.body)
-        .then(newArticle => res.status(201).send(newArticle))
+        .then((newArticle) => {
+            Article.findById(newArticle._id)
+                .lean()
+                .then((article) => {
+                    article.comment_count = 0;
+                    res.status(201).send(article);
+                })
+        })
 }
-
 
 
 

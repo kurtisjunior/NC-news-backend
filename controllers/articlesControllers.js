@@ -40,7 +40,7 @@ const oneArticle = (req, res, next) => {
 
 const allComments = (req, res, next) => {
     const match = req.params.article_id;
-    Comment.find({ 'belongs_to': match }).populate('belongs_to').populate('created_by')
+    Comment.find({ 'belongs_to': match }).populate('belongs_to created_by')
         .then(comments => res.status(200).send(comments))
 }
 
@@ -59,7 +59,6 @@ const postComment = (req, res, next) => {
 const voteQuery = (req, res, next) => {
     const id = req.params.article_id
     const query = req.query.vote;
-    //not great readability but does the job
     Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
         .then(article => {
             res.send(article);
