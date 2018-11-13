@@ -11,7 +11,7 @@ const getTopicArticles = (req, res, next) => {
         .lean()
         .then((articlesForTopic => {
             if (!articlesForTopic || articlesForTopic.length === 0) {
-                return Promise.reject({ status: 404 })
+                return Promise.reject({ status: 404, msg: 'invalid parameter' })
             } else {
                 const articlesWithCommentCount = articlesForTopic.map((article) => {
                     return Comment.find({ belongs_to: article._id })
@@ -39,7 +39,9 @@ const postArticle = (req, res, next) => {
                     res.status(201).send(article);
                 })
         })
+        .catch(next)
 }
+
 
 
 

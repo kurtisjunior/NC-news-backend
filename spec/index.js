@@ -11,14 +11,14 @@ const { articles, comments, topics, users } = require(database)
 
 
 describe('/api', () => {
-    let topicDocs, userDocs, articleDocs, commentDocs, bad_id = mongoose.Types.ObjectId();
+    let topicDocs, userDocs, articleDocs, commentDocs, invalid_id = mongoose.Types.ObjectId();
     beforeEach(() => {
         return seedDB(articles, comments, topics, users)
-            .then((allDocs) => {
-                articleDocs = allDocs[0]
-                commentDocs = allDocs[1];
-                topicDocs = allDocs[2];
-                userDocs = allDocs[3];
+            .then(([articles, comments, topics, users]) => {
+                articleDocs = articles
+                commentDocs = comments
+                topicDocs = topics
+                userDocs = users
             })
     })
 
@@ -49,12 +49,12 @@ describe('/api', () => {
                     expect(result.body[0].belongs_to).to.equal(articleDocs[0].belongs_to)
                 })
         })
-        it('returns a status 404 for an invalid topic', () => {
+        it('returns a status 404 if a topic does not exist', () => {
             return request
                 .get(`/api/topics/tennis/articles`)
                 .expect(404)
                 .then(result => {
-                    expect(result.body.msg).to.equal('page not found')
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
                 })
 
         })
@@ -78,7 +78,24 @@ describe('/api', () => {
                     expect(result.body.title).to.equal(mezut.title)
                 })
         })
+        it('returns a status 400 when a required field is missing', () => {
+            const mezut = ({
+                votes: '10',
+                created_at: "2018-04-16T19:29:32.774Z",
+                created_by: "5bd3237c1e6558f70b448de4",
+                body: "11 wins on the bounce.",
+                belongs_to: "football"
+            })
+            return request
+                .post('/api/topics/football/articles')
+                .send(mezut)
+                .expect(400)
+                .then(result => {
+                    expect(result.body.msg).to.equal('Required field missing')
+                })
+        })
     })
+
     describe('GET /api/articles', () => {
         it('returns a status 200 and all of the articles', () => {
             return request
@@ -86,6 +103,14 @@ describe('/api', () => {
                 .expect(200)
                 .then((result) => {
                     expect(result.body[0].title).to.equal(articleDocs[0].title)
+                })
+        })
+        it('returns the same length array of articles', () => {
+            return request
+                .get('/api/articles')
+                .expect(200)
+                .then((result) => {
+                    expect(result.body.length).to.equal(articleDocs.length)
                 })
         })
     })
@@ -100,12 +125,12 @@ describe('/api', () => {
                     expect(result.body.body).to.equal(articleDocs[0].body);
                 })
         })
-        it('GET returns a 404 if the ID does not exist', () => {
+        it('GET returns a status 404 if a valid ID does not exist in database', () => {
             return request
-                .get(`/api/articles/${bad_id}`)
+                .get(`/api/articles/${invalid_id}`)
                 .expect(404)
                 .then((result) => {
-                    expect(result.body.msg).to.equal('page not found')
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
                 })
         })
     })
@@ -118,6 +143,14 @@ describe('/api', () => {
                 .then((result) => {
                     expect(result.body[0].votes).to.equal(commentDocs[0].votes)
                     expect(result.body[0].body).to.equal(commentDocs[0].body)
+                })
+        })
+        it('returns a status 404 if a valid ID does not exist in database', () => {
+            return request
+                .get(`/api/articles/${invalid_id}/comments`)
+                .expect(404)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
                 })
         })
     })
@@ -139,6 +172,21 @@ describe('/api', () => {
                     expect(result.body.body).to.equal(test.body)
                 })
         })
+        it('returns a status 400 when a required field is missing', () => {
+            const test = ({
+                votes: "7",
+                created_at: "2017-07-26T06:42:10.835Z",
+                belongs_to: "5bd3237c1e6558f70b448df2",
+                created_by: "5bd3237c1e6558f70b448de2"
+            })
+            return request
+                .post(`/api/articles/${articleDocs[0]._id}/comments`)
+                .send(test)
+                .expect(400)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Required field missing')
+                })
+        })
     })
 
     describe('PATCH /api/articles/:article_id', () => {
@@ -151,7 +199,16 @@ describe('/api', () => {
                     expect(result.body.votes).to.equal(vote + 1);
                 })
         })
+        it('returns a status 404 if a valid ID does not exist in the database', () => {
+            return request
+                .patch(`/api/articles/${invalid_id}?vote=up`)
+                .expect(404)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Requesting invalid parameter');
+                })
+        })
     })
+
     describe('PATCH /api/articles/:comment_id', () => {
         it('returns a status 200 and updates a comment vote count', () => {
             const vote = commentDocs[0].votes
@@ -162,7 +219,16 @@ describe('/api', () => {
                     expect(result.body.votes).to.equal(vote - 1);
                 })
         })
+        it('returns a status 404 if a valid ID does not exist in the database', () => {
+            return request
+                .patch(`/api/comments/${invalid_id}?vote=down`)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
+                })
+        })
     })
+
+
     describe('DELETE /api/comments/:comment_id', () => {
         it('returns a status 200 and deletes an individual comment', () => {
             return request
@@ -171,6 +237,15 @@ describe('/api', () => {
                 .then((result) => {
                     expect(result.body.body).to.equal(commentDocs[0].body)
                 })
+        })
+        it('returns a status 404 when a valid ID does not exist in the database', () => {
+            return request
+                .delete(`/api/comments/${invalid_id}`)
+                .expect(404)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
+                })
+
         })
     })
     describe('GET users by username', () => {

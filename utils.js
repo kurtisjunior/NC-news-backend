@@ -1,3 +1,8 @@
+
+// Per feedback 'not needed'
+
+
+
 exports.formatTopics = (topicData) => {
     const topics = topicData.map((element) => {
         return {
@@ -63,4 +68,6 @@ exports.formatComments = (commentsRawData, users, articles) => {
     })
     return comments;
 }
+
+
 

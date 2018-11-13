@@ -26,7 +26,7 @@ const oneArticle = (req, res, next) => {
         .lean()
         .then(singleArticle => {
             if (!singleArticle) {
-                return Promise.reject({ status: 404 })
+                return Promise.reject({ status: 404, msg: 'valid ID not found' })
             } else {
                 Comment.find({ belongs_to: match })
                     .then((comments) => {
@@ -41,28 +41,42 @@ const oneArticle = (req, res, next) => {
 const allComments = (req, res, next) => {
     const match = req.params.article_id;
     Comment.find({ 'belongs_to': match }).populate('belongs_to created_by')
-        .then(comments => res.status(200).send(comments))
+        .then(comments => {
+            if (comments.length === 0) {
+                return Promise.reject({ status: 404, msg: 'valid ID does not exist' })
+            } else {
+                res.status(200).send(comments)
+            }
+        })
+        .catch(next)
 }
+
 
 const postComment = (req, res, next) => {
     Comment.create(req.body)
         .then(newComment => {
-            //returns the new comment populated
             return Comment.findById(newComment._id).populate('created_by')
         })
         .then((newComment) => {
             res.status(201).send(newComment);
         })
+        .catch(next)
 }
 
 
 const voteQuery = (req, res, next) => {
-    const id = req.params.article_id
+    const invalidId = req.params.article_id
     const query = req.query.vote;
-    Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
+    Article.findOneAndUpdate(invalidId, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
         .then(article => {
-            res.send(article);
+            if (JSON.stringify(article._id) !== JSON.stringify(invalidId)) {
+                return Promise.all({ status: 404, msg: 'valid ID does not exist' })
+            } else {
+                res.send(article);
+            }
+
         })
+        .catch(next)
 }
 
 module.exports = { getAllArticles, oneArticle, allComments, postComment, voteQuery }
