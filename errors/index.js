@@ -9,7 +9,7 @@ const handle400 = ((err, req, res, next) => {
 })
 
 const handle404 = ((err, req, res, next) => {
-    if (err.status === 404 && err.msg === 'valid ID not found' || 'invalid parameter') res.status(404).send({ msg: 'Requesting invalid parameter' })
+    if (err.status === 404 && err.msg === 'valid ID not found' || err.msg === 'invalid parameter') res.status(404).send({ msg: 'Requesting invalid parameter' })
     else if (err.status === 404) res.status(404).send({ msg: "page not found" })
     else next(err);
 });

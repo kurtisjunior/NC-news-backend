@@ -2,16 +2,16 @@ const { Comment } = require('../models/index')
 
 
 const deleteComment = (req, res, next) => {
-    const invalidId = req.params.comment_id
-    return Comment.findOneAndRemove(invalidId)
+    const id = req.params.comment_id
+    return Comment.findByIdAndRemove({ _id: id })
         .then((result) => {
-            if (JSON.stringify(result._id) !== JSON.stringify(invalidId)) {
+            if (JSON.stringify(result._id) !== JSON.stringify(id)) {
                 return Promise.reject({ status: 404, msg: 'valid ID does not exist' })
             } else {
                 res.send(result)
             }
         })
-        .catch(next)
+        .catch(console.log)
 }
 
 const voteQuery = (req, res, next) => {
