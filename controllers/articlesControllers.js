@@ -53,8 +53,12 @@ const allComments = (req, res, next) => {
 
 
 const postComment = (req, res, next) => {
-    console.log(req.body, 'here')
-    Comment.create(req.body)
+    const newComment = {
+        body: req.body.body,
+        created_by: req.body.created_by,
+        belongs_to: req.params.article_id
+    }
+    Comment.create(newComment)
         .then(newComment => {
             return Comment.findById(newComment._id).populate('created_by')
         })
