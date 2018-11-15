@@ -22,7 +22,7 @@ const getAllArticles = (req, res, next) => {
 
 const oneArticle = (req, res, next) => {
     const match = req.params.article_id;
-    Article.findOne({ '_id': match }).populate('created_by')
+    Article.findOne({ '_id': match }).populate('created_buy')
         .lean()
         .then(singleArticle => {
             if (!singleArticle) {
@@ -53,6 +53,7 @@ const allComments = (req, res, next) => {
 
 
 const postComment = (req, res, next) => {
+    console.log(req.body, 'here')
     Comment.create(req.body)
         .then(newComment => {
             return Comment.findById(newComment._id).populate('created_by')
@@ -65,9 +66,9 @@ const postComment = (req, res, next) => {
 
 
 const voteQuery = (req, res, next) => {
-    const invalidId = req.params.article_id
+    const id = req.params.article_id
     const query = req.query.vote;
-    Article.findOneAndUpdate(invalidId, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
+    Article.findOneAndUpdate(id, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
         .then(article => {
             // if (JSON.stringify(article._id) !== JSON.stringify(invalidId)) {
             //     return Promise.all({ status: 404, msg: 'valid ID does not exist' })
