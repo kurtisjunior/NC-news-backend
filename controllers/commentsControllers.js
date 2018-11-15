@@ -20,11 +20,10 @@ const voteQuery = (req, res, next) => {
     Comment.findOneAndUpdate(invalidId, query === 'up' ? { $inc: { 'votes': 1 } } : query === 'down' ? { $inc: { 'votes': - 1 } } : { $inc: { 'votes': 0 } }, { new: true })
         .then(article => {
             //because the 'true' returns a new data entry 
-            if (JSON.stringify(article._id) !== JSON.stringify(invalidId)) {
-                return Promise.reject({ status: 404, msg: 'valid ID does not exist' })
-            } else {
-                res.send(article)
-            }
+            // if (JSON.stringify(article._id) !== JSON.stringify(invalidId)) {
+            //     return Promise.reject({ status: 404, msg: 'valid ID does not exist' })
+            // } else {
+            res.send(article)
         })
         .catch(next)
 }
