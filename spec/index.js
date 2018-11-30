@@ -249,7 +249,7 @@ describe('/api', () => {
         })
     })
     describe('GET users by username', () => {
-        it('returns a status 200 and correct user by username', () => {
+        it.only('returns a status 200 and correct user by username', () => {
             return request
                 .get(`/api/users/${userDocs[0].username}`)
                 .expect(200)
