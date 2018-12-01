@@ -254,9 +254,18 @@ describe('/api', () => {
                 .get(`/api/users/${userDocs[0].username}`)
                 .expect(200)
                 .then((result) => {
-                    expect(result.body[0].username).to.equal(userDocs[0].username)
+                    expect(result.body.username).to.equal(userDocs.username)
                 })
         })
+        it('returns a 404 when given a username that does not exist', () => {
+            return request
+                .get(`/api/users/kurtis`)
+                .expect(404)
+                .then((result) => {
+                    expect(result.body.msg).to.equal('Requesting invalid parameter')
+                })
+        })
+
     })
     after(() => {
         mongoose.disconnect()
