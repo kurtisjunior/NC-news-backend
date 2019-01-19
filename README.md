@@ -32,7 +32,7 @@ module.exports = config[NODE_ENV];
 Finally, run NPM RUN SEED DEV to seed the development into the Mongo database. 
 
 ### Testing 
-To run tests run NPM TEST.  The test data is much smaller than the production data – lest there are any unwanted edits to a live production database. Tests can be run with the command NPM TEST. This command also re-seeds the test database on every command. The tests check all CRUD operations. This includes get, post, patch and delete. It also ensures errors are handled with the correct status codes and messages. 
+To test run NPM TEST.  The test data is much smaller than the production data – lest there are any unwanted edits to a live production database. Tests can be run with the command NPM TEST. This command also re-seeds the test database on every command. The tests check all CRUD operations. This includes get, post, patch and delete. It also ensures errors are handled with the correct status codes and messages. 
 
 For example:   
 
