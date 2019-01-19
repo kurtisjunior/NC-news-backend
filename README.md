@@ -1,6 +1,6 @@
 # NorthCoders News Dashboard
 
-This project serves a RESTful api backend for a news aggregator app. It allows users to search profiles, articles by topic, post articles, comment on articles, up/down vote articles and comments, and delete comments. 
+This project serves a RESTful api backend for a news aggregator app. It allows users to search profiles, filter articles by topic, order topics, post articles, comment on articles, up/down vote articles and comments, and delete comments. 
 
 ### Prerequisites
 This project has been built by and runs in NODE. The further dependencies can be installed by running NPM INSTALL in the command line. The additional packages are: Express, Body-Parser and Mongoose. The test suite uses Chai, Mocha and SuperTest.  
