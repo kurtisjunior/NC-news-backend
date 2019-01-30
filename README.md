@@ -61,5 +61,5 @@ This test ensures all topics for a particular topic are returned successfully. I
 
 The project can be deployed live on Heroku: https://dashboard.heroku.com/apps with data stored in MLab: https://mlab.com/. Here is my live deployed version: https://git.heroku.com/kurtisncnews.git
 
-Author: Kurtis Angell – Learning JavaScript at NorthCoders. 
+Author: Kurtis Angell. 
 
